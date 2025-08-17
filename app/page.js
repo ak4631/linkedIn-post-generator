@@ -10,8 +10,8 @@ export default function LinkedInPostGenerator() {
   const [streaming, setStreaming] = useState(false);
 
   const postTypes = [
-    { value: "motivational", label: "Motivational", icon: TrendingUp },
     { value: "educational", label: "Educational", icon: User },
+    { value: "motivational", label: "Motivational", icon: TrendingUp },
     { value: "story", label: "Personal Story", icon: MessageCircle },
     { value: "tips", label: "Tips & Advice", icon: Sparkles }
   ];
@@ -34,6 +34,7 @@ export default function LinkedInPostGenerator() {
       });
 
       const data = await response.json();
+      
       setGeneratedPost(data.response);
     } catch (error) {
       setGeneratedPost("Error generating post: " + error.message);
@@ -74,7 +75,7 @@ export default function LinkedInPostGenerator() {
             if (jsonStr) {
               try {
                 const data = JSON.parse(jsonStr);
-                setGeneratedPost((prev) => prev + data.content);
+                setGeneratedPost((prev) => prev + data.content.replaceAll("**",""));
               } catch (e) {
                 console.error("Failed to parse JSON from stream line:", jsonStr, e);
               }
@@ -154,7 +155,7 @@ export default function LinkedInPostGenerator() {
                     <button
                       key={type.value}
                       onClick={() => setPostType(type.value)}
-                      className={`p-3 rounded-xl border-2 transition-all duration-200 flex items-center justify-center ${
+                      className={`p-3 rounded-xl border-2 cursor-pointer transition-all duration-200 flex items-center justify-center ${
                         postType === type.value
                           ? "border-blue-500 bg-blue-50 text-blue-700"
                           : "border-gray-200 hover:border-gray-300 text-gray-600"
@@ -170,7 +171,7 @@ export default function LinkedInPostGenerator() {
 
             {/* Generate Buttons */}
             <div className="flex gap-3">
-              <button
+              {/* <button
                 onClick={handleGenerate}
                 disabled={!niche.trim() || loading || streaming}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center"
@@ -183,7 +184,7 @@ export default function LinkedInPostGenerator() {
                     Generate Post
                   </>
                 )}
-              </button>
+              </button> */}
               
               <button
                 onClick={handleStreamGenerate}
@@ -195,7 +196,7 @@ export default function LinkedInPostGenerator() {
                 ) : (
                   <>
                     <MessageCircle className="w-5 h-5 mr-2" />
-                    Stream Generate
+                    Generate Post
                   </>
                 )}
               </button>
@@ -257,108 +258,3 @@ export default function LinkedInPostGenerator() {
   );
 }
 
-
-// "use client";
-// import Image from "next/image";
-// import styles from "./page.module.css";
-// import { useState } from "react";
-
-// export default function Home() {
-//   const [message,setMessage] = useState("");
-//   const [response,setResponse] = useState("");
-//   const [streaming,setStreaming] = useState("");
-//   const [loading,setLoading]=useState("");
-//   const [streamResponse,setStreamResponse] = useState("");
-
-//   const handleStreamChat = async() =>{
-//     setLoading(true);
-//     setResponse("");
-//     try {
-//       const response = await fetch("/api/chat",{
-//         method:"POST",
-//         headers:{
-//           "Content-Type":"application/json"
-//         },
-//         body:JSON.stringify({message})
-//       })
-
-//       const data = await response.json();
-//       setResponse(data.response);
-//     } catch (error) {
-//       setResponse("Error: " + error.message)
-//     }
-//     setLoading(false);
-//   }
-
-//   const handleStreamingResponse = async() =>{
-//     setStreaming(true);
-//     setStreamResponse("");
-//     try {
-//       const response = await fetch("/api/chat_stream",{
-//         method:"POST",
-//         headers:{
-//           "Content-Type":"application/json"
-//         },
-//         body:JSON.stringify({message})
-//       })
-
-//       const reader = response.body.getReader();
-//       const decoder = new TextDecoder();
-//       while(true){
-//         const {done,value} = await reader.read();
-//         if(done) break;
-
-//         const chunk = decoder.decode(value);
-//         const lines = chunk.split("\n");
-
-//         for(const line of lines){
-//           if(line.startsWith("data:")){
-//             // const data = JSON.parse(line.slice(7));
-//             // setStreamResponse((prev)=>prev + data.content);
-//              const jsonStr = line.slice(5).trim(); // OR slice(5) if there's no space
-//             if (jsonStr) {
-//               try {
-//                 const data = JSON.parse(jsonStr);
-//                 setStreamResponse((prev) => prev + data.content);
-//               } catch (e) {
-//                 console.error("Failed to parse JSON from stream line:", jsonStr, e);
-//               }
-//             }
-//           }
-//         }
-//       }
-//       // const data = await
-//     } catch (error) {
-//        setStreamResponse("Error: " + error.message)
-//     }
-//     setStreaming(false);
-//   }
-
-//   return (
-//     <div className={styles.page}>
-//       <div style={{
-//         width: "100%",
-//         alignItems: "center",
-//         justifyContent: "center",
-//         display: "flex",
-//         flexDirection: "column",
-//         margin:"auto"
-//       }}>
-//         <div>
-//           <textarea placeholder="Enter Your Text" onChange={(e)=>setMessage(e.target.value)} value={message} rows={6}/>
-//         </div>
-//         <div style={{border:"2px solid",margin:"10px 0px",padding:"10px 20px"}}>
-//           Response: {response}
-//         </div>
-//         <div style={{border:"2px solid",margin:"10px 0px",padding:"10px 20px"}}>
-//           Streaming Response: {streamResponse}
-//         </div>
-//         <div style={{display:"flex",gap:"1rem"}}>
-//           <button onClick={handleStreamChat}>{loading ? "Loading..." : "Chat"}</button>
-//           <button onClick={handleStreamingResponse}>{streaming ? "Loading..." : "Stream Chat"}</button>
-//         </div>
-        
-//       </div>
-//     </div>
-//   );
-// }
